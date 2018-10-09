@@ -1,0 +1,96 @@
+01 ��� 2018 12:59:51 [INFO] Client connected: TCP Connection: /127.0.0.1: 1873
+01 ��� 2018 12:59:51 [INFO]   disconnected TCP Connection: /127.0.0.1: 1874
+01 ��� 2018 12:59:51 [INFO] Status of the user: agent name: Vasia Registration completed
+01 ��� 2018 12:59:51 [INFO]   has ended the chat
+01 окт 2018 13:04:23 [INFO] Client connected: TCP Connection: /127.0.0.1: 1898
+01 окт 2018 13:04:23 [INFO]   disconnected TCP Connection: /127.0.0.1: 1899
+01 окт 2018 13:04:23 [INFO] Status of the user: agent name: Vasia Registration completed
+01 окт 2018 13:04:23 [INFO]   has ended the chat
+01 окт 2018 13:05:18 [INFO] Client connected: TCP Connection: /127.0.0.1: 1919
+01 окт 2018 13:05:19 [INFO]   disconnected TCP Connection: /127.0.0.1: 1920
+01 окт 2018 13:05:19 [INFO] Status of the user: agent name: Vasia Registration completed
+01 окт 2018 13:05:19 [INFO]   has ended the chat
+01 окт 2018 13:06:19 [INFO]   has ended the chat
+01 окт 2018 13:06:40 [INFO]   has ended the chat
+01 окт 2018 13:08:57 [INFO]   has ended the chat
+01 окт 2018 13:09:12 [INFO]   has ended the chat
+01 окт 2018 13:09:52 [INFO]   has ended the chat
+01 ��� 2018 13:11:47 [INFO] Client connected: TCP Connection: /127.0.0.1: 1981
+01 ��� 2018 13:11:47 [INFO]   disconnected TCP Connection: /127.0.0.1: 1982
+01 ��� 2018 13:11:47 [INFO] Status of the user: agent name: Vasia Registration completed
+01 ��� 2018 13:11:47 [INFO]   has ended the chat
+01 ��� 2018 13:12:46 [INFO] Client connected: TCP Connection: /127.0.0.1: 1997
+01 ��� 2018 13:12:46 [INFO]   disconnected TCP Connection: /127.0.0.1: 1998
+01 ��� 2018 13:12:46 [INFO] Status of the user: agent name: Vasia Registration completed
+01 ��� 2018 13:12:46 [INFO]   has ended the chat
+09 окт 2018 12:26:21 [INFO] Client connected: TCP Connection: /127.0.0.1: 2277
+09 окт 2018 12:26:22 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 12:39:06 [INFO] Client connected: TCP Connection: /127.0.0.1: 2334
+09 окт 2018 12:39:06 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 12:57:32 [INFO] Client connected: TCP Connection: /127.0.0.1: 2395
+09 окт 2018 12:57:32 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:28:21 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:30:51 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:31:10 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:38:17 [INFO] access denied. Wrong registration parameters Vasia Agent
+09 окт 2018 13:39:32 [INFO] access denied. Wrong registration parameters Vasia Agent
+09 окт 2018 13:40:06 [INFO] Client connected: TCP Connection: /127.0.0.1: 2552
+09 окт 2018 13:40:06 [INFO] access denied. Wrong registration parameters Vasia Agent
+09 окт 2018 13:40:06 [INFO] access denied. Wrong registration parameters Vasia Agent
+09 окт 2018 13:42:11 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:42:12 [INFO] Client connected: TCP Connection: /127.0.0.1: 2571
+09 окт 2018 13:42:12 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:42:12 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2572
+09 окт 2018 13:42:12 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:42:12 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:42:37 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:42:37 [INFO] Vasia agent has ended the chat
+09 окт 2018 13:43:15 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:43:15 [INFO] Client connected: TCP Connection: /127.0.0.1: 2593
+09 окт 2018 13:43:15 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:43:15 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2594
+09 окт 2018 13:43:15 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:43:15 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:43:15 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:43:15 [INFO] Vasia agent has ended the chat
+09 окт 2018 13:46:17 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:46:17 [INFO] Client connected: TCP Connection: /127.0.0.1: 2613
+09 окт 2018 13:46:17 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:46:17 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2614
+09 окт 2018 13:46:17 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:46:38 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:47:22 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:47:22 [INFO] Client connected: TCP Connection: /127.0.0.1: 2632
+09 окт 2018 13:47:22 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:47:22 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2633
+09 окт 2018 13:47:22 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:47:23 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:47:23 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:47:23 [INFO] Vasia agent has ended the chat
+09 окт 2018 13:49:44 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:53:14 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:54:01 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:54:01 [INFO] Client connected: TCP Connection: /127.0.0.1: 2676
+09 окт 2018 13:54:01 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:54:01 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2677
+09 окт 2018 13:54:02 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:54:02 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:54:02 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:54:02 [INFO] Vasia agent has ended the chat
+09 окт 2018 13:54:41 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:55:37 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:55:37 [INFO] Client connected: TCP Connection: /127.0.0.1: 2698
+09 окт 2018 13:55:38 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:55:38 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2699
+09 окт 2018 13:55:38 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:55:38 [INFO] Status of the user: agent name: Vasia Registration completed
+09 окт 2018 13:55:38 [INFO] access denied. Wrong registration parameters agent Vasia
+09 окт 2018 13:55:38 [INFO] Vasia agent has ended the chat
+09 ��� 2018 13:59:34 [INFO] access denied. Wrong registration parameters agent Vasia
+09 ��� 2018 13:59:34 [INFO] Client connected: TCP Connection: /127.0.0.1: 2741
+09 ��� 2018 13:59:35 [INFO] access denied. Wrong registration parameters agent Vasia
+09 ��� 2018 13:59:35 [INFO] Vasia agent disconnected TCP Connection: /127.0.0.1: 2742
+09 ��� 2018 13:59:35 [INFO] Status of the user: agent name: Vasia Registration completed
+09 ��� 2018 13:59:35 [INFO] Status of the user: agent name: Vasia Registration completed
+09 ��� 2018 13:59:35 [INFO] access denied. Wrong registration parameters agent Vasia
+09 ��� 2018 13:59:35 [INFO] Vasia agent has ended the chat

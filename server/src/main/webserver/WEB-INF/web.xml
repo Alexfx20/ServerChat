@@ -1,0 +1,24 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2.4.xsd"
+  version="2.4">
+  
+<servlet>
+	<servlet-name>webChat1</servlet-name>
+	<servlet-class>com.example.web.chatSelect</servlet-class>
+</servlet>
+
+<servlet-mapping>
+	<servlet-name>webChat1</servlet-name>
+	<url-pattern>/SelectChat.do</url-pattern>
+</servlet-mapping>
+
+<listener>
+	<listener-class>
+	ru.secondchat.web.StartServletContextListener
+	</listener-class>
+</listener>
+	
+	
+
+</web-app>
