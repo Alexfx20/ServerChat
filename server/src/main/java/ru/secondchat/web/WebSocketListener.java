@@ -11,8 +11,7 @@ import java.io.IOException;
 
 
 @ServerEndpoint(value = "/ru/secondchat/web")
-public class WebSocketListener implements ConnectionListener{
-
+public class WebSocketListener implements ConnectionListener {
     private Session session;
     private WebSocketConnection connection;
 
@@ -49,6 +48,7 @@ public class WebSocketListener implements ConnectionListener{
     public void onError(Throwable error){
 
         error.printStackTrace();
+
         connection.addMessage("/exit");
 
 
@@ -61,20 +61,6 @@ public class WebSocketListener implements ConnectionListener{
 
 
 
-    @Override
-    public void onConnectionReady(Connection connection) {
-
-    }//наследство от EventListener
-
-    @Override
-    public void onRegistration(Connection connection) {
-
-    }//наследство от EventListener
-
-    @Override
-    public void onReciveMessage(Connection connection, String value) {
-
-    }//наследство от EventListener
 
     @Override
     public void onDisconnect(Connection connection) {
@@ -96,14 +82,14 @@ public class WebSocketListener implements ConnectionListener{
 
             if (value.startsWith("/left")) {
                 connection.addMessage("/endOfChat");
-                value = value.substring(6, value.length()) + " ended the conversation";
+                value = "User ended the conversation: "+value.substring(6, value.length());
             }
             else if (value.startsWith("/out")) {
                 connection.addMessage("/endOfChat");
-                value = value.substring(5, value.length()) + " exit the program";
+                value = "User exit the program: "+value.substring(5, value.length());
             }
             else if (value.startsWith("/Timeout")) {
-                    value = " You have just exceeded latency time ";
+                    value = "You have just exceeded latency time ";
             }
             else if (value.equals("/access denied")) {
                     value = "Access denied. Wrong registration parameters";
@@ -117,7 +103,23 @@ public class WebSocketListener implements ConnectionListener{
                 onException(this.connection, e);
             e.printStackTrace();
         }
+    }
 
+
+    // наследуемые но не используемые методы от ConnectionListener
+    @Override
+    public void onConnectionReady(Connection connection) {
 
     }
+
+    @Override
+    public void onRegistration(Connection connection) {
+
+    }
+
+    @Override
+    public void onReciveMessage(String value) {
+
+    }
+
 }

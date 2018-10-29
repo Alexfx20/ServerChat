@@ -1,16 +1,20 @@
 package ru.secondchat.server;
 
 
+
+
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.secondchat.network.Connection;
+import ru.secondchat.network.WebSocketConnection;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.*;
+
+
 
 
 
@@ -18,86 +22,98 @@ import java.util.concurrent.*;
 public class Server {
 
     static final Logger rootLogger = LogManager.getRootLogger();
-
+    //static final Logger rootLogger = LogManager.getLogger(Server.class);
 
     private int PORT;
     private static int MAX_ALLOWED_CONNECTIONS;
     private int MAX_MINUTES_ONLINE;
     private static int MAX_AGENTS;
     private static Properties properties;
-    private static boolean isshutDown;
+    private static volatile boolean isShutDown;
     private static Server server;
 
 
     static LinkedBlockingQueue<ClientHandler> customers;
     static LinkedBlockingQueue<ClientHandler> agents;
     static LinkedBlockingQueue<Connection>  connections;
-    static int k = 0;
-
+    static long k = 0;
+    static public volatile String hello = "Hello message";
 
     static{
-        try {
-            properties = new Properties();
-            properties.load(new FileInputStream("Settings.prop"));
-            MAX_ALLOWED_CONNECTIONS = Integer.parseInt(properties.getProperty("MAX_ALLOWED_CONNECTIONS"));
-            MAX_AGENTS = Integer.parseInt(properties.getProperty("MAX_AGENTS"));
+       // try {
+           // properties = new Properties();
+           // properties.load(new FileInputStream("Settings.prop"));
+            MAX_ALLOWED_CONNECTIONS = 100;//Integer.parseInt(properties.getProperty("MAX_ALLOWED_CONNECTIONS"));
+            MAX_AGENTS = 20;// Integer.parseInt(properties.getProperty("MAX_AGENTS"));
             customers = new LinkedBlockingQueue<>(MAX_ALLOWED_CONNECTIONS-MAX_AGENTS);
             agents = new LinkedBlockingQueue<>(MAX_AGENTS);
             connections = new LinkedBlockingQueue<>();
             server = new Server();
 
-        } catch (FileNotFoundException e) {
+       /* } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        catch (IOException e){e.printStackTrace();}
+        catch (IOException e){e.printStackTrace();}*/
 
     }
 
     public static void main(String [] args) {
+
+
         server.go();
+
     }
 
     public Server() {
-        PORT = Integer.parseInt(properties.getProperty("PORT"));
-        MAX_MINUTES_ONLINE = Integer.parseInt(properties.getProperty("MAX_MINUTES_ONLINE"));
-        isshutDown = false;
+        PORT = 5000;//Integer.parseInt(properties.getProperty("PORT"));//здесь ошибки задаем порт вручную
+        MAX_MINUTES_ONLINE = 2;//Integer.parseInt(properties.getProperty("MAX_MINUTES_ONLINE"));
+        isShutDown = false;
 
         System.out.println("Server running... " + new Date());
 
     }
 
      public void go(){
-        ExecutorService pool = Executors.newFixedThreadPool(MAX_ALLOWED_CONNECTIONS);//максимальное количество соединений
-        ((ThreadPoolExecutor)pool).setKeepAliveTime(MAX_MINUTES_ONLINE,TimeUnit.SECONDS);//время жизни бездействующих в пуле потоков
-        ((ThreadPoolExecutor)pool).allowCoreThreadTimeOut(true);//возможность прерывания бездействующих потоков, не превышающих максимальное количество в 100 штук
-         pool.execute( new Switcher()); //запуск служебных потоков
+        ExecutorService pool = Executors.newFixedThreadPool(100);//максимальные соединения
+        ((ThreadPoolExecutor)pool).setKeepAliveTime(120,TimeUnit.SECONDS);
+        ((ThreadPoolExecutor)pool).allowCoreThreadTimeOut(true);
+         pool.execute( new Switcher());
          pool.execute(new SocketListener(PORT));
         try {
-            while (!isshutDown) {
+            while (!isShutDown) {
                 try {
-                    pool.execute(new ClientHandler(connections.take(), k + 1));//запускается обработчик клиента при появлении нового соединения в очереди
-                    k += 1;
+                    pool.execute(new ClientHandler(connections.take(), k ));
                       rootLogger.info("Connection request "+k);
-                } catch (InterruptedException e) {rootLogger.error("InterruptedException");}
-
+                    k += 1;
+                } catch (InterruptedException e) {//rootLogger.error("InteruptedException")}
+                }
             }
         }
 
         finally {
             pool.shutdownNow();
-            rootLogger.info("Server stopped");
+            rootLogger.info("Server stoped");
         }
 
     }
 
-    public void shutDown(){
-        rootLogger.info("Shutting down the server...");
-        isshutDown = true;
+    public static void shutDown(){
+        rootLogger.info("Shuting down the server...");
+
+        isShutDown = true;
+        SocketListener.closeServerSocket();
+        Switcher.disturbSwitcher();
+        connections.add(new WebSocketConnection());
+        closeAllConnections();
 
     }
+    static void runServer(){
+        isShutDown = false;
+    }
 
-    static boolean isIsshutDown() {
-        return isshutDown;
+
+    static boolean IsshutDown() {
+        return isShutDown;
     }
 
     public static Server getServer() {
@@ -117,7 +133,19 @@ public class Server {
     public static void addAgents(ClientHandler agent)throws InterruptedException{//добавить агента
         agents.put(agent);
     }
-    public static void addConnections(Connection connection)throws InterruptedException{//добавить соединение
+    public static void addConnections(Connection connection)throws InterruptedException{//добавить агента
         connections.put(connection);
+    }
+    public static int getConnectionsSize(){//добавить агента
+        return connections.size();
+    }
+
+    private static void closeAllConnections(){
+        for (Map.Entry<Long, ClientHandler> agent: StatisticsHolder.allAgents.entrySet()) {
+            agent.getValue().stopClientHandlersThread();
+        }
+        for (Map.Entry<Long, ClientHandler> client: StatisticsHolder.allClients.entrySet()) {
+            client.getValue().stopClientHandlersThread();
+        }
     }
 }

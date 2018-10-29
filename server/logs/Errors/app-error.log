@@ -1,9 +1,0 @@
-2018-09-26T21:14:23,078 [ERROR][pool-2-thread-1 ][.secondchat.server.ClientHandler] - client client Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:14:56,701 [ERROR][pool-2-thread-2 ][.secondchat.server.ClientHandler] - agent agent Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:15:19,954 [ERROR][pool-2-thread-3 ][.secondchat.server.ClientHandler] - agent agent Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:18:43,562 [ERROR][pool-2-thread-7 ][.secondchat.server.ClientHandler] - client client Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:48:10,920 [ERROR][pool-2-thread-1 ][.secondchat.server.ClientHandler] - agent agent Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:50:50,229 [ERROR][pool-2-thread-4 ][.secondchat.server.ClientHandler] - agent agent Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:51:07,048 [ERROR][pool-2-thread-5 ][.secondchat.server.ClientHandler] - agent agent Exception occurred java.net.SocketException: Software caused connection abort: recv failed
-2018-09-26T21:51:26,732 [ERROR][pool-2-thread-2 ][.secondchat.server.ClientHandler] - client client Exception occurred java.net.SocketException: Connection reset
-2018-09-30T23:34:52,473 [ERROR][pool-2-thread-2 ][.secondchat.server.ClientHandler] -   Exception occurred java.net.SocketException: Connection reset

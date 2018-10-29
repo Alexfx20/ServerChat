@@ -2,13 +2,13 @@ package ru.secondchat.network;
 
 import java.io.IOException;
 
-public interface Connection {//определяет методы соединения.
+public interface Connection {
 
-    void startNewChat();//метод используюется только в консольном клиенте для запуска второго потока-слушателя.
-    void sendMessage(String value);//отправка единичного сообщения
-    String recieveSingleMessage()throws IOException;//получение единичного сообщения
+    void startNewChat();
+    void sendMessage(String value);
+    String recieveSingleMessage()throws IOException;
     void disconnect();
-    void setEventListener(ConnectionListener eventListener);//устанавливает ClientHandlera обслуживающего данное соединение
-    void setSoTimeout(int idleTime);//максимальное время простаивания соединения
+    void setEventListener(ConnectionListener eventListener);
+    void setSoTimeout(int idleTime);
 
 }

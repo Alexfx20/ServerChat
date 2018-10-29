@@ -6,10 +6,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebSocketConnection implements Connection {
 
-    private ConnectionListener eventListener;       //обычный clientHandler
+    private ConnectionListener eventListener;       //обычный clientHandle
     private ConnectionListener websocketListener;   //WebSocekListener обрабатывает отправляемые текущему клиенту сообщения
     private LinkedBlockingQueue<String> receivedMessages = new LinkedBlockingQueue<>();// очередь из сообщений поступающих от клиента
     Session session;
+
+    public WebSocketConnection(){}
 
     public WebSocketConnection(ConnectionListener websocketListener, Session session) {
         this.websocketListener = websocketListener;
@@ -27,7 +29,7 @@ public class WebSocketConnection implements Connection {
     @Override
     public void startNewChat() {
 
-    }//это наследство от обычного Socket соединения
+    }
 
     @Override
     public synchronized void sendMessage(String value) {
@@ -55,7 +57,7 @@ public class WebSocketConnection implements Connection {
     }
 
     @Override
-    public void disconnect() {              //делегируем disconnect классу EndPoint и обнуляем ссылки
+    public synchronized void disconnect() {              //делегируем disconnect классу EndPoint и обнуляем ссылки
         websocketListener.onDisconnect(this);
         eventListener = null;
         websocketListener = null;
@@ -71,8 +73,16 @@ public class WebSocketConnection implements Connection {
     }
 
     @Override
-    public void setSoTimeout(int idleTime) {    //устанавливаем время ожидания
+    public synchronized void setSoTimeout(int idleTime) {
+        if(session!=null)//устанавливаем время ожидания
         session.setMaxIdleTimeout(idleTime);
-    }//мак допустимое время бездействия
+        if(idleTime <=1000) {
+            try {
+                receivedMessages.put("endMessage");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

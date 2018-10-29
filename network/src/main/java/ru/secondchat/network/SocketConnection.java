@@ -14,11 +14,11 @@ public class SocketConnection implements Connection {
     private final PrintWriter out;
     private ConnectionListener eventListener;
 
-    public SocketConnection(ConnectionListener eventListener, String ip, int port) throws IOException {//конструктор для консольного клиента
+    public SocketConnection(ConnectionListener eventListener, String ip, int port) throws IOException {
         this(eventListener, new Socket(ip, port));
     }
 
-    public SocketConnection(ConnectionListener event, Socket socket) throws IOException {//конструктор для сервера
+    public SocketConnection(ConnectionListener event, Socket socket) throws IOException {
         this(socket);
         this.eventListener = event;
     }
@@ -28,22 +28,23 @@ public class SocketConnection implements Connection {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream(), Charset.forName("UTF-8")));
         out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8")), true);
 
-        rxThread = new Thread(new Runnable() {//данный поток позволяет параллельно прослушивать входящие сообщения в консольном клиенте
+        rxThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try{
+
                     while(!rxThread.isInterrupted()){
                         try{
 
-                        eventListener.onReciveMessage(SocketConnection.this, SocketConnection.this.recieveSingleMessage());}
+                        eventListener.onReciveMessage(SocketConnection.this.recieveSingleMessage());}
                         catch(SocketTimeoutException e){
-                            System.out.println("TimeOut Exception in rxThread");
+                            System.out.println("TimeOut occured");
                         }
                     }
 
                 } catch(IOException e){
                     eventListener.onException(SocketConnection.this, e);
-                    System.out.println("IOException in rxThread");
+                    System.out.println("Exception in eventListener connectionThread: thread was interrupted, while waiting for incoming messages");
 
                 }
 
@@ -57,6 +58,7 @@ public class SocketConnection implements Connection {
 
     public synchronized void sendMessage(String value){
         if(value!=null){
+           /* if(socket.isClosed()) System.out.println("CLOSED");*/
         out.print(value);
         out.println();}
         else {eventListener.onException(SocketConnection.this, new IOException());
@@ -72,9 +74,13 @@ public class SocketConnection implements Connection {
     public synchronized void disconnect(){
         if(!rxThread.isInterrupted())
         rxThread.interrupt();
+        /*if(rxThread.isInterrupted())
+        System.out.println("Thread stoped");*/
         try {
             if (socket.isConnected())
             socket.close();
+            /*if (socket.isClosed()) System.out.println("socket closed");*/
+
         } catch (IOException e) {
             System.out.println("Exception in disconnect method");
             eventListener.onException(SocketConnection.this, e);
@@ -92,7 +98,7 @@ public class SocketConnection implements Connection {
     }
 
     @Override
-    public void setSoTimeout(int idleTime) {
+    public synchronized void setSoTimeout(int idleTime) {
         try {
             socket.setSoTimeout(idleTime);
         } catch (SocketException e) {

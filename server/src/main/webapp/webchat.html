@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Элементы форм в HTML5</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="script.js" defer=""></script>
+    </head>
+    <body>
+        <div class="mutualView">
+            <div id ="autorization">
+                <h2>Регистрация</h2>
+                <form autocomplete ="off" onsubmit="return false;">
+                    <fieldset>
+                        <legend>Введите данные:</legend>
+                        <label for="login">Имя:</label><br>
+                        <input type="text" name="login" id="login" autocomplete="off" required />
+                        <br>
+                        <label for="password">Пароль:</label><br>
+                        <input type="password" name="password" id="password" /><br>
+
+                        <p>
+                        <input type="radio" value="client" checked name="status" id="client"/>Клинет
+           
+                        <input type="radio" value="agent" name="status" id = "agent"/>Агент<br>
+                        <label for="connections">Max connections: </label>
+                        <input type="number" list="priceList"
+                    step="1" min="1" max="5" value="1" id="connections" name="connections"/>
+                        </p>
+                
+                        <input onclick="getDataAndConnect();" type="button" value="Connect">
+                    </fieldset>
+            
+                </form> 
+            </div>
+            <div class="wrapper">
+                <div id="tabs">
+                    <ul id="items">
+                        <li class="active" id = "li-0"><a href="#tabs-0">Chat 1</a></li>
+                    </ul>
+                </div>
+            <div class="tab-content" id ="t-cont">
+                <div id="tabs-0" class="tabs-text">
+                    <form autocomplete ="off" onsubmit="return false;">
+                        <input class="inpField" id="$0" type="text" placeholder="write your message" maxlength="200" height="80" size = "68">
+                        <br>
+                        <input onclick="wsSendMessage('$0');" value="Send" type="button">
+                        <input onclick="leaveChat('$0');" value="Leave Chat" type="button">
+                        <input onclick="Disconnect();" value="Disconnect" type="button">
+                    </form>
+                        <br>
+                    <textarea class="mesArea" id="messageArrea$0" cols="70" rows="8" readonly="true"></textarea>
+                </div>
+            </div>
+            </div>
+        </div>
+    </body>
+</html>

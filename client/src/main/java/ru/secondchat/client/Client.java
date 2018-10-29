@@ -14,61 +14,51 @@ public class Client implements ConnectionListener {
     private static final int PORT = 5000;
     private static Connection connection;
     private static boolean isOnline = true;
-    Scanner sc;
-    String name;
-    String status;
+    private Scanner sc;
+    private String name;
+    private String status;
+    private String regParams;
 
 
     public static void main(String[] args) {
-        new Client();
+        new Client().go();
 
     }
 
     public Client() {
-        try {
             sc=new Scanner(System.in);
-
-            this.connection = new SocketConnection(this, IP,PORT);
-            this.onConnectionReady(connection);
-            this.onRegistration(connection);
-            connection.startNewChat();//слушаем входящие
-            transmitMessage();//передаем исходящие
-        } catch (IOException e) {
-            System.out.println("Connection Exception: "+e);
-        }
-
     }
-//реализация методов интерфейса ConnectionListener
+
     @Override
     public void onConnectionReady(Connection connection) {
         try{
         if(connection!=null)
             System.out.println(connection.recieveSingleMessage());
         else System.out.println("Server is unavailable, try again later");}
-        catch(IOException e){e.printStackTrace();}
-    }
-
-    @Override
-    public void onRegistration(Connection connection) {
-        try{
-
-                System.out.print(connection.recieveSingleMessage()+" ");
-                name = sc.nextLine();
-                connection.sendMessage(name);
-                System.out.print(connection.recieveSingleMessage()+" ");
-                status = sc.nextLine();
-                connection.sendMessage(status);
-
-
-        }
         catch(IOException e){
-            System.out.println("Something bad happening...");
+            System.out.println("Server refused to provide a connection");
         }
 
     }
 
     @Override
-    public void onReciveMessage(Connection connection, String value) {
+    public void onRegistration(Connection connection) throws IOException{
+        //try{
+
+                System.out.print(connection.recieveSingleMessage()+" ");
+                if(!regParams.isEmpty())
+                connection.sendMessage(regParams);
+
+
+        //}
+        /*catch(IOException e){
+            System.out.println("Something bad happening...");
+        }*/
+
+    }
+
+    @Override
+    public void onReciveMessage(String value) {
 
         processCommands(value);
 
@@ -89,25 +79,33 @@ public class Client implements ConnectionListener {
 
     @Override
     public void processCommands(String value) {
-       if(value.startsWith("/left")){//собеседник закончил беседу
+       if(value.startsWith("/left")){
             connection.sendMessage("/endOfChat");
+           System.out.println(value);
             value = value.substring(6,value.length())+" ended the conversation";
+           System.out.println(value);
         }
-        else if (value.startsWith("/out")){//собеседник закрыл программу
+        else if (value.startsWith("/out")){
            connection.sendMessage("/endOfChat");
+           System.out.println(value);
            value = value.substring(5,value.length())+" exit the program";
+           System.out.println(value);
+
        }
-        else if(value.startsWith("/Timeout")){          //произошел TimeOut
+        else if(value.startsWith("/Timeout")){
            printMessage("You have just exceeded latency time");
            value = "Press ENTER to exit the program";
            isOnline = false;
            onDisconnect(connection);
         }
-        else if (value.equals("/access denied")){       //неправильные регистрационные параметры
+        else if (value.equals("/access denied")){
            printMessage("Access denied. Wrong registration parameters: "+status+" "+name);
            isOnline = false;
            value = "press ENTER to exit the program";
+
            onDisconnect(connection);
+
+
        }
        else if (value.equals("/exit")){
            onDisconnect(connection);
@@ -117,20 +115,72 @@ public class Client implements ConnectionListener {
 
     }
 
-    public void processSelfCommand(String value){//для прерывания цикла в методе transmitMessage и отсылки сообщений на сервер
+    public void processSelfCommand(String value){
         connection.sendMessage(value);
         if(value.equals("/exit")){
             isOnline = false;
         }
+
+
     }
 
+
+
     private synchronized void printMessage(String message){
+        if(status.equals("agent")){
+            int indexOfID = message.lastIndexOf("$");
+            if(indexOfID!=-1)
+            message=message.substring(0,indexOfID);
+        }
         System.out.println(message);
+
     }
 
     private void transmitMessage(){
+
         while(isOnline){
             processSelfCommand(sc.nextLine());
         }
     }
+
+    private void go(){
+        if(innerRegistration()){
+            try {
+                this.connection = new SocketConnection(this, IP, PORT);
+                this.onConnectionReady(connection);
+                this.onRegistration(connection);
+                connection.startNewChat();
+                transmitMessage();
+            } catch (IOException e) {
+                System.out.println("Connection Exception: " + e);
+            }
+        }
+    }
+
+
+    private boolean innerRegistration(){
+        regParams="/register ";
+        System.out.println("Please enter your name: ");
+        name = sc.nextLine();
+        if(!name.isEmpty()){
+           int forbidenSlash = name.indexOf(" ");
+           int forbidenAmpersand = name.indexOf("$");
+           while(forbidenAmpersand!=-1||forbidenSlash!=-1){
+               System.out.println("space characters and ampersands '$' are not allowed in Name");
+               System.out.println("try again or type /exit to exit the program");
+               name=sc.nextLine();
+               forbidenSlash = name.indexOf(" ");
+               forbidenAmpersand = name.indexOf("$");
+           }
+           if(name.equals("/exit")) return false;
+           else regParams +=name+" ";
+        }
+        System.out.println("Please enter your status (client or agent): ");
+        status=sc.nextLine();
+        regParams +=status;
+
+        return true;
+    }
+
+
 }

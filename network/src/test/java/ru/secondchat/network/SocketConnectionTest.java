@@ -110,7 +110,7 @@ public class SocketConnectionTest {
         }
 
         @Override
-        public void onReciveMessage(Connection connection, String value) {
+        public void onReciveMessage(String value) {
 
             //value!=null&&!value.equals(""))//sendMessage отсылает вслед за value еще пустую строку, что может приводить к затеранию value в тестах
                 received = value;//кроме того т.к. присвоение значения received осуществляется в другом потоке, проверка assert может выполняться раньше чем
