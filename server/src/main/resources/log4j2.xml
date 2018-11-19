@@ -12,7 +12,7 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
 
-<RollingFile name="infoLog" fileName="server/logs/chatInfo/app-info.log"
+<RollingFile name="infoLog" fileName="${sys:catalina.home}/logs/chatInfo/app-info.log"
             filePattern="${APP_LOG_ROOT}/app-info-%d{yyyy-MM-dd}-%i.log" >
             <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
@@ -22,7 +22,7 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
 
-<RollingFile name="errorLog" fileName="server/logs/Errors/app-error.log"
+<RollingFile name="errorLog" fileName="${sys:catalina.home}/logs/Errors/app-error.log"
             filePattern="${APP_LOG_ROOT}/app-error-%d{yyyy-MM-dd}-%i.log" >
             <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="%d{ISO8601} [%-5p][%-16.16t][%32.32c] - %m%n"/>

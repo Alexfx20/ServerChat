@@ -55,8 +55,8 @@ public class SocketConnectionTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        assertEquals("праллельный примем сообщения на стороне клиента не работает", "hello", received);
-        assertTrue("в конце каждой строки не отсылается разделитель строк", separatorMessage.equals(""));
+        assertEquals("Parralel thread doesn'r receive message on the client side", "hello", received);
+        assertTrue("line separator missed at the end of each string", separatorMessage.equals(""));
         clientConnection.disconnect();
     }
 
@@ -93,7 +93,7 @@ public class SocketConnectionTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertEquals("не закрывается сокет", received, null);
+        assertEquals("couldn't close the socket", received, null);
 
 
     }

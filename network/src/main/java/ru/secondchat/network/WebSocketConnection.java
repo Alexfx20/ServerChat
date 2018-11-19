@@ -33,7 +33,7 @@ public class WebSocketConnection implements Connection {
 
     @Override
     public synchronized void sendMessage(String value) {
-       if(value.startsWith("/"))            //отсылаем сообщение webSocketListener на обработку
+       if(value.startsWith(Commands.COMMAND_IDENTIFIER.getCommand()))            //отсылаем сообщение webSocketListener на обработку
         websocketListener.processCommands(value);
        else {
            try {

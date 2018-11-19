@@ -3,6 +3,7 @@ package ru.secondchat.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.network.ConnectionListener;
 import ru.secondchat.network.SocketConnection;
@@ -18,6 +19,7 @@ import java.net.SocketTimeoutException;
 public class ClientHandler implements Runnable, ConnectionListener {
       //тут начинается
       static final Logger clientLogger = LogManager.getLogger(ClientHandler.class);
+      private static int MAX_IDLE_TIME_MIN = Server.getConfigurator().getMAX_MINUTES_ONLINE();
 
         private Connection handlingUser;//ссылка на свое соединение
 
@@ -55,13 +57,13 @@ public class ClientHandler implements Runnable, ConnectionListener {
                 this.onRegistration(handlingUser);// регистрируемся на сервере
                 while(!user.isExit()) {//До тех пор пока пользователь не ввел команду /exit повторяем цикл
                     user.onHold(this);//вызываем метод, который ожидает пользовательского ввода первого сообщения, после чего помещаем пользователя в очередь
-                    handlingUser.setSoTimeout(600000);// увеличиваем тайм аут до 10 минут на время коммуникации с агентом
+                    handlingUser.setSoTimeout(MAX_IDLE_TIME_MIN*1000*60);// увеличиваем тайм аут до 10 минут на время коммуникации с агентом
                     while(user.isReadyToChat()) {
                         try{
                         this.onReciveMessage(handlingUser.recieveSingleMessage());}//ожидаем сообщения от пользователя в случае получения пересылаем его агенту
                         catch(SocketTimeoutException e){
                             System.out.println("ловим зедсь Exception");
-                            if(user.isOnChat()){handlingUser.sendMessage("/Timeout" );
+                            if(user.isOnChat()){handlingUser.sendMessage(Commands.TIME_OUT.getCommand());
                             onException(handlingUser, e);
                             }
                         }
@@ -71,7 +73,7 @@ public class ClientHandler implements Runnable, ConnectionListener {
             }
             catch(SocketTimeoutException e){
                 System.out.println("Socket Exception");
-                handlingUser.sendMessage("/Timeout" );
+                handlingUser.sendMessage(Commands.TIME_OUT.getCommand() );
                 this.onException(handlingUser, e);
             }
             catch (IOException e){
@@ -125,7 +127,7 @@ public class ClientHandler implements Runnable, ConnectionListener {
     }
 
      public void processCommands(String value){
-            if(value.startsWith("/leave")){
+            if(value.startsWith(Commands.LEAVE.getCommand())){
                 user.leave(value);
                 /*user.setReadyToChat(false);
                 user.setPromptForRelax(true);
@@ -134,18 +136,18 @@ public class ClientHandler implements Runnable, ConnectionListener {
                 recipient.sendMessage(String.format("/left %s", user.getName()));}//String.format("%s has just left the chat./", name)
                 clientLogger.info(user.getStatus()+" "+user.getName()+" has ended the chat");*/
             }
-            else if(value.startsWith("/exit")){
+            else if(value.startsWith(Commands.EXIT.getCommand())){
                 user.exit(value);
                 /*user.setReadyToChat(false);
                 if(recipientClient!=null){
                     recipientClient.getUser().setReadyToChat(false);
                 recipient.sendMessage(String.format("/out %s", user.getName()));}*/
-               handlingUser.sendMessage("/exit");
+               handlingUser.sendMessage(Commands.EXIT.getCommand());
                 user.setExit(true);
                 //System.out.println(status+" "+name+" has exit the program at "+new Date());
 
                 }
-                else if(value.equals("/endOfChat")) System.out.println(value);
+                /*else if(value.equals(Commands.END_OF_CHAT.getCommand())) *//*System.out.println(value)*//*;*/
 
      }
 
@@ -183,7 +185,7 @@ public class ClientHandler implements Runnable, ConnectionListener {
                     break;
                 default:
                     clientLogger.info("access denied. Wrong registration parameters "+ name+" "+ status);
-                    handlingUser.sendMessage("/access denied");
+                    handlingUser.sendMessage(Commands.ACCESS_DENIED.getCommand());
                     user = new Customer(name, status);
                     user.setExit(true);
                     break;
@@ -198,7 +200,7 @@ public class ClientHandler implements Runnable, ConnectionListener {
          } catch (InterruptedException e) {
              e.printStackTrace();
          }*/
-         if(value.startsWith("/")){
+         if(value.startsWith(Commands.COMMAND_IDENTIFIER.getCommand())){
              processCommands(value);//данный метод обрабатывает команды с консоли
          }
             else
@@ -246,8 +248,13 @@ public class ClientHandler implements Runnable, ConnectionListener {
             else {
          clientLogger.error(user.getStatus()+" "+user.getName()+" Exception occurred "+e);
          e.printStackTrace();}
-         if(user!=null)//данная проверка необходима чтобы не воодить дополнитлеьную обработку исключения выкинутого в методе onRegistratio в случае когда превышено время ожидания до регистрации и инициализации USer
-         user.setExit(true);
+         if(user!=null){//данная проверка необходима чтобы не воодить дополнитлеьную обработку исключения выкинутого в методе onRegistratio в случае когда превышено время ожидания до регистрации и инициализации USer
+
+                user.exit(Commands.EXIT.getCommand());
+                user.setExit(true);
+
+            }
+
 
          //onDisconnect(connection); тут
 

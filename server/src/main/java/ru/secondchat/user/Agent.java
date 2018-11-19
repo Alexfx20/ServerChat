@@ -1,5 +1,6 @@
 package ru.secondchat.user;
 
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.server.ClientHandler;
 import ru.secondchat.server.Server;
@@ -31,7 +32,7 @@ public class Agent extends User{
             handlingUser.setSoTimeout(600000);//устанавливаем время отдыха для агента 10 мин
             handlingUser.sendMessage("Write a line whenever You are ready");//ждем первого сообщения от пользователя
             String firstMessage = handlingUser.recieveSingleMessage();//обработка аналогично клиенту
-            if(!(firstMessage.startsWith("/exit")||firstMessage.startsWith("/leave"))) {
+            if(!(firstMessage.startsWith(Commands.EXIT.getCommand())||firstMessage.startsWith(Commands.LEAVE.getCommand()))) {
 
                 this.setPromptForRelax(false);//если все ок, переводим флаги в режим готовности к чату
             }
@@ -82,7 +83,7 @@ public class Agent extends User{
                 if(isOnChat()){
             switch (getMaxNumberOfRecipients()) {
                 case "1":
-                    recipient.sendMessage(getStatus() + " " + getName() + " " + message);
+                    recipient.sendMessage(getStatus() + " " + getName() + " : " + message);
                     break;
                 default:
                     String ID = extractID(message);//каждое сообщение от юзера отсылается с прикрепленным к нему ID
@@ -95,7 +96,7 @@ public class Agent extends User{
                     Connection con = recipientClient.getHandlingUser();//из мапы берем поток получателя и вытаскиваем из него connection
                     int idLength=message.lastIndexOf(ID);
                     if (idLength!=-1)message=message.substring(0,idLength);
-                    con.sendMessage(getStatus() + " " + getName() + " " + message);
+                    con.sendMessage(getStatus() + " " + getName() + " : " + message);
                     break;
             }
         }
@@ -105,7 +106,7 @@ public class Agent extends User{
     public void leave(String value) {
         if(getMaxNumberOfRecipients().equals("1"))
             super.leave(value);
-       else if(recipientsMap.size()<2||value.startsWith("/leaveAll")){setReadyToChat(false);
+       else if(recipientsMap.size()<2||value.startsWith(Commands.LEAVE_ALL.getCommand())){setReadyToChat(false);
             setPromptForRelax(true);
             endChatWithAllRecipients();
        }
@@ -116,7 +117,9 @@ public class Agent extends User{
             if (recipId!=null){
             recipientsMap.remove(ID);
             recipId.getUser().endChatWith(ID, recipId);
-            recipId.getHandlingUser().sendMessage(String.format("/left %s %s", getStatus(), getName()));//здесь в конце был ID
+            Connection recipientConnection = recipId.getHandlingUser();
+            if(recipientConnection!=null)
+            recipientConnection.sendMessage(String.format("%s %s %s", Commands.LEFT.getCommand(), getStatus(), getName()));//здесь в конце был ID
             clientLogger.info(getStatus()+" "+getName()+" has ended the chat");}
         }
     }
@@ -180,7 +183,10 @@ public class Agent extends User{
             for (ConcurrentMap.Entry<String, ClientHandler> pair:recipientsMap.entrySet()) {
                 ClientHandler recip = pair.getValue();
                 recip.getUser().endChatWith(ID, recip);
-                recip.getHandlingUser().sendMessage(String.format("/out %s %s", getStatus(), getName()));//здесь в конце бы ID
+                Connection recipientConnection = recip.getHandlingUser();
+                if(recipientConnection!=null){
+
+                    recipientConnection.sendMessage(String.format("%s %s %s",Commands.OUT.getCommand(), getStatus(), getName()));}//здесь в конце бы ID
             }
         }
     }

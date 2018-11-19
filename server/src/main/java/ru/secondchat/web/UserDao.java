@@ -5,7 +5,6 @@ import ru.secondchat.server.StatisticsHolder;
 import ru.secondchat.user.Chat;
 import ru.secondchat.user.User;
 
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,16 +19,7 @@ public class UserDao {
 
 
         List<ClientHandler> list = new ArrayList<>(statistics.getAgents().values());
-        if(list.isEmpty())return null;
-        System.out.println(list);
-        if(!selectPages(pageNumber, pageSize, list.size())) return null;
-        List<ClientHandler> result = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-
-            System.out.println(list.get(i));
-
-            result.add(list.get(i));
-        }
+        List<ClientHandler> result = chooseDateAccordingPagination(list, pageNumber, pageSize);
         System.out.println(result);
         return result;
     }
@@ -37,14 +27,7 @@ public class UserDao {
     public List<ClientHandler> getFreeAgents(int pageNumber, int pageSize) {
 
         ClientHandler[] clientHandler = statistics.getFreeagents().toArray(new ClientHandler[0]);
-        if(clientHandler.length==0)return null;
-        if(!selectPages(pageNumber, pageSize, clientHandler.length)) return null;
-        List<ClientHandler> result = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-            result.add(clientHandler[i]);
-            System.out.println(clientHandler[i]);
-
-        }
+        List<ClientHandler> result = chooseDateAccordingPagination(clientHandler, pageNumber, pageSize);
         System.out.println(result);
         return result;
     }
@@ -65,12 +48,8 @@ public class UserDao {
     public List<ClientHandler> getClients(int pageNumber, int pageSize) {
 
         ClientHandler[] clientHandler = statistics.getFreeclients().toArray(new ClientHandler[0]);
-        if(clientHandler.length==0)return null;
-        if(!selectPages(pageNumber, pageSize, clientHandler.length)) return null;
-        List<ClientHandler> result = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-            result.add(clientHandler[i]);
-        }
+        List<ClientHandler> result = chooseDateAccordingPagination(clientHandler, pageNumber, pageSize);
+
         return result;
     }
 
@@ -80,64 +59,16 @@ public class UserDao {
     }
 
     public List<Chat> getChats(int pageNumber, int pageSize){
-        List<Chat> list = new ArrayList(statistics.getChats().values());
-        if(list.isEmpty())return null;
-        if(!selectPages(pageNumber, pageSize, list.size())) return null;
-        List<Chat> result = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-            result.add(list.get(i));
-        }
+        List<Chat> result = new ArrayList(statistics.getChats().values());
+        result = chooseDateAccordingPagination(result, pageNumber, pageSize);
+
         return result;
     }
     public Chat getChatByID(long id){
 
-
         return statistics.getChatByID(id);
     }
 
-
-    //метод обеспечивает поддержку пагинации
-    private boolean selectPages(int pageNumber, int pageSize, int listSize) {
-        System.out.println("pageSize= "+pageSize);
-        System.out.println("pageNum= "+pageNumber);
-        this.start = 0;
-        this.end = listSize;
-        if (pageSize != 0) {
-            this.start = pageNumber * pageSize;
-            this.end = start + pageSize;
-            if(end>listSize) this.end=listSize;
-        }
-        System.out.println("start= "+start);
-        System.out.println("end= "+end);
-
-        return true;
-    }
-
-    public Response getMap(int pn, int ps){
-
-        return Response
-                .status(200)
-                .entity(StatisticsHolder.getAgents().toString())
-                .build();
-    }
-
-    public Response getResponse(int pageNumber, int pageSize){
-        List<ClientHandler> list = new ArrayList<>(statistics.getAgents().values());
-        if(list.isEmpty()) return null;
-        System.out.println(list);
-        if(!selectPages(pageNumber, pageSize, list.size())) return null;
-        List<String> result = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-            System.out.println(list.get(i));
-            result.add(list.get(i).toString());
-        }
-        System.out.println(result);
-        return Response
-                .status(200)
-                .entity(result)
-                .build();
-
-    }
     //добавляем юзера
     public String addUser(String id, String name, String status, int numOfChats){
         if(id==null||status==null||name==null)
@@ -147,10 +78,10 @@ public class UserDao {
         id=id.trim();
         if(!isParametersCorrect(id, name, status, numOfChats))
             return null;
-        System.out.println("ID= "+id);
+        /*System.out.println("ID= "+id);
         System.out.println(" name= "+name);
         System.out.println(" status= "+status);
-        System.out.println(" numOfChats= "+numOfChats);
+        System.out.println(" numOfChats= "+numOfChats);*/
        RestClientsHandler currentUser = new RestClientsHandler();
         String response=currentUser.register(id, name, status, numOfChats);
 
@@ -197,13 +128,47 @@ public class UserDao {
             listOfMessages.add(currentUser.response("no messages received", id));
             return listOfMessages;
         }
-        if(!selectPages(pageNumber, pageSize, messages.length)) return null;
+        listOfMessages = chooseDateAccordingPagination(messages, pageNumber, pageSize);
 
-        for (int i = start; i < end; i++) {
-            System.out.println(messages[i]);
-            listOfMessages.add(messages[i]);
-        }
         return listOfMessages;
+    }
+
+    //метод обеспечивает поддержку пагинации
+    private boolean selectPages(int pageNumber, int pageSize, int listSize) {
+        System.out.println("pageSize= "+pageSize);
+        System.out.println("pageNum= "+pageNumber);
+        this.start = 0;
+        this.end = listSize;
+        if (pageSize != 0) {
+            this.start = pageNumber * pageSize;
+            if(start>=listSize)return false;        //show that asked page does't exist.
+            this.end = start + pageSize;
+            if(end>listSize) this.end=listSize;     //if the size of last page less than specified pageSize, nevertheless show all information of last page.
+        }
+
+        return true;
+    }
+
+    private <T> List<T> chooseDateAccordingPagination(List<T> list, int pageNumber, int pageSize){
+        if(list.isEmpty())return null;
+        System.out.println(list);
+        if(!selectPages(pageNumber, pageSize, list.size())) return null;
+        List<T> result = new ArrayList<>();
+        for (int i = start; i < end; i++) {
+
+            result.add(list.get(i));
+        }
+        return result;
+    }
+
+    private <T> List<T> chooseDateAccordingPagination(T[] array, int pageNumber, int pageSize){
+        if(array.length==0)return null;
+        if(!selectPages(pageNumber, pageSize, array.length)) return null;
+        List<T> result = new ArrayList<>();
+        for (int i = start; i < end; i++) {
+            result.add(array[i]);
+        }
+        return result;
     }
 
 

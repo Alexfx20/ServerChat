@@ -1,6 +1,8 @@
 package ru.secondchat.web;
 
 import io.swagger.jaxrs.config.BeanConfig;
+import ru.secondchat.server.Configurator;
+import ru.secondchat.server.Server;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,15 +15,16 @@ public class SwaggerConfigurationServlet extends HttpServlet {
 
     public void init(ServletConfig config) throws ServletException{
         super.init(config);
+        Configurator configurator = Server.getConfigurator();
         BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setBasePath("/server-1.0-SNAPSHOT/rest");
-        beanConfig.setHost("localhost:8080");
-        beanConfig.setTitle("Chat RestServices Docs");
+        beanConfig.setBasePath(configurator.getBeanConfigSetBasePath());
+        beanConfig.setHost(configurator.getBeanConfigSetHost());
+        beanConfig.setTitle(configurator.getBeanConfigSetTitle());
         beanConfig.setResourcePackage("ru.secondchat.web");
         beanConfig.setPrettyPrint(true);
         beanConfig.setScan(true);
-        beanConfig.setSchemes(new String[]{"http"});
-        beanConfig.setVersion("1.0");
+        beanConfig.setSchemes(new String[]{configurator.getBeanConfigSetSchemes()});
+        beanConfig.setVersion(configurator.getBeanConfigSetVersion());
     }
 
 }

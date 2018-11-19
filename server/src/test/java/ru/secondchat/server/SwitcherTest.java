@@ -3,6 +3,7 @@ package ru.secondchat.server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.WebSocketConnection;
 
 import static org.junit.Assert.assertEquals;
@@ -19,8 +20,8 @@ public class SwitcherTest {
 //       //server = new Server();
         switcher = new Switcher();
         TestSocketConnection user = new TestSocketConnection();
-        user.addMessage("/register Smith agent");
-        user.addMessage("/register Dusia client");
+        user.addMessage(Commands.REGISTER.getCommand()+" Smith agent");
+        user.addMessage(Commands.REGISTER.getCommand()+" Dusia client");
         agent = new ClientHandler(user, 1);
         agent.onRegistration(user);
 
@@ -38,8 +39,8 @@ public class SwitcherTest {
         //switcher.BARRIER.await(1, TimeUnit.SECONDS);//вызвать await чтобы switcher увидел изменившийся флаг
 
         switcher = null;
-        Server.customers.remove(client);
-        Server.agents.remove(agent);
+        Server.getCustomers().remove(client);
+        Server.getAgents().remove(agent);
         agent = null;
         client = null;
 
@@ -50,8 +51,8 @@ public class SwitcherTest {
         agent.getUser().setReadyToChat(true);
         client.getUser().setReadyToChat(true);// рассмотреть случаи с несколькими юзерами и при флаге readytochatfalse false
 
-        Server.agents.put(agent);
-        Server.customers.put(client);
+        Server.addAgents(agent);
+        Server.addCustomers(client);
         switcher.BARRIER.await();
             Thread.sleep(1000);
 
@@ -68,9 +69,9 @@ public class SwitcherTest {
         System.out.println("клиент устанавливаем флаг");
         client.getUser().setReadyToChat(false);
         System.out.println("кладем агента");
-        Server.agents.put(agent);
+        Server.addAgents(agent);
         System.out.println("кладем клиента");
-        Server.customers.put(client);
+        Server.addCustomers(client);
         switcher.BARRIER.await();
         Thread.sleep(1000);
         assertEquals("if client isn't ready to chat agent must be returned to the queue", agent.getUser().isInTheQueue(),true);
@@ -78,7 +79,7 @@ public class SwitcherTest {
         assertEquals("assighment of recipient when client flag isReadyTochat false", agent.getRecipient(),null);
         agent.getUser().setReadyToChat(false);
         client.getUser().setReadyToChat(true);
-        Server.customers.put(client);
+        Server.addCustomers(client);
         client.getUser().setInTheQueue(true);
         switcher.BARRIER.await();
         Thread.sleep(1000);

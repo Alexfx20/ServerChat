@@ -5,10 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.secondchat.user.Chat;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 public class Switcher extends Thread{
     static final Logger clientLogger = LogManager.getLogger(ClientHandler.class);
@@ -16,11 +13,15 @@ public class Switcher extends Thread{
     static private ClientHandler agent;
     public static final CyclicBarrier BARRIER = new CyclicBarrier(2);
 
+
+
+
     @Override
     public void run() {
+        clientLogger.info("Switcher thread running...");
         while(!Server.IsshutDown()){
 
-            if(Server.customers.isEmpty() || Server.agents.isEmpty()) {
+            if(Server.getCustomersSize() == 0 || Server.getAgentsSize() == 0) {
                 try {
 
                     System.out.println("Switcher trying to get a nap");
@@ -51,14 +52,14 @@ public class Switcher extends Thread{
         }*/
 
         try {
-
-                agent = Server.agents.take();       //берем агента
-
-                synchronized (agent) {
+                agent = Server.getAgents().poll();
+                if (agent == null) return;
+                synchronized (agent) {//Теперь синхронизируем его, чтобы он случайно не вышел  в другом потоке
                     System.out.println("агент синхронизирован");
-                    agent.getUser().setInTheQueue(false);//Теперь синхронизируем его, чтобы он случайно не вышел  в другом потоке
+                    agent.getUser().setInTheQueue(false);
                     if (agent.getHandlingUser() != null&&agent.getUser().isReadyToChat()) { //т.к. не проиcходит удаление клиентов из очереди при их выходе, то проверяем не вышел ли клинет в процессе ожидания
-                        client = Server.customers.take();// если клинет вышел, то ссылка на его соединение обнуляется, достаем клинета из очереди
+
+                        client = Server.getCustomers().poll();// если клинет вышел, то ссылка на его соединение обнуляется, достаем клинета из очереди
                         synchronized (client) {
                             System.out.println("клиент синхронизирован");
                             client.getUser().setInTheQueue(false);// теперь берем клинета и делаем с ним тоже самое
@@ -68,13 +69,13 @@ public class Switcher extends Thread{
                                 client.setRecipient(agent, ID);//устанавливаем получателя клиенту
                                 agent.getHandlingUser().sendMessage("Client ON-LINE "+client.getFirstMessage()+ID);//оповещаем клинета об установленном соединении
                                 client.getHandlingUser().sendMessage("Agent "+agent.getUser().getName()+" ON-LINE");//оповещаем агетна об установленном соединении
-                                if(!agent.getUser().isFluded()){Server.agents.put(agent); agent.getUser().setInTheQueue(true);} //если возможно возвращаем агента в очередь и устанавливаем флаг, что он в очереди
+                                if(!agent.getUser().isFluded()){Server.addAgents(agent); agent.getUser().setInTheQueue(true);} //если возможно возвращаем агента в очередь и устанавливаем флаг, что он в очереди
                                 // System.out.println("Клиент "+client.getName()+" connected to "+agent.getName()+" at "+new Date());
                                 clientLogger.info("Client " + client.getUser().getName() + " connected to " + agent.getUser().getName());
                                 StatisticsHolder.chats.put(client.getId(),new Chat(agent, client));
 
                             } else{
-                                Server.agents.put(agent);
+                                Server.addAgents(agent);
                                 agent.getUser().setInTheQueue(true);//помечаем что агент опять в очереди
                                 }//если вдруг оказалось, что клиент вышел, то возвращаем агента обратно в очередь, и ожидаем нового клиента
                         }

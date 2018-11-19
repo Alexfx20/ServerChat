@@ -1,6 +1,2 @@
-**/*.iml
 .iml
 .idea
-server/target
-client/target
-network/target

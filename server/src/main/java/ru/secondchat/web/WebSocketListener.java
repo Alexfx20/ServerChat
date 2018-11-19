@@ -1,5 +1,6 @@
 package ru.secondchat.web;
 
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.network.ConnectionListener;
 import ru.secondchat.network.WebSocketConnection;
@@ -49,7 +50,7 @@ public class WebSocketListener implements ConnectionListener {
 
         error.printStackTrace();
 
-        connection.addMessage("/exit");
+        connection.addMessage(Commands.EXIT.getCommand());
 
 
     }
@@ -70,7 +71,7 @@ public class WebSocketListener implements ConnectionListener {
 
     @Override
     public void onException(Connection connection, Exception e) {
-        this.connection.addMessage("/exit");
+        this.connection.addMessage(Commands.EXIT.getCommand());
         e.printStackTrace();
 
 
@@ -80,21 +81,21 @@ public class WebSocketListener implements ConnectionListener {
     public void processCommands(String value) {
 
 
-            if (value.startsWith("/left")) {
-                connection.addMessage("/endOfChat");
-                value = "User ended the conversation: "+value.substring(6, value.length());
+            if (value.startsWith(Commands.LEFT.getCommand())) {
+                connection.addMessage(Commands.END_OF_CHAT.getCommand());
+                value = "User ended the conversation: "+value.substring(Commands.LEFT.getCommand().length()+1, value.length());
             }
-            else if (value.startsWith("/out")) {
-                connection.addMessage("/endOfChat");
-                value = "User exit the program: "+value.substring(5, value.length());
+            else if (value.startsWith(Commands.OUT.getCommand())) {
+                connection.addMessage(Commands.END_OF_CHAT.getCommand());
+                value = "User exit the program: "+value.substring(Commands.OUT.getCommand().length()+1, value.length());
             }
-            else if (value.startsWith("/Timeout")) {
+            else if (value.startsWith(Commands.TIME_OUT.getCommand())) {
                     value = "You have just exceeded latency time ";
             }
-            else if (value.equals("/access denied")) {
+            else if (value.equals(Commands.ACCESS_DENIED.getCommand())) {
                     value = "Access denied. Wrong registration parameters";
             }
-            else if (value.equals("/exit")) {
+            else if (value.equals(Commands.EXIT.getCommand())) {
                     value = "Good Bye";
             }
         try {

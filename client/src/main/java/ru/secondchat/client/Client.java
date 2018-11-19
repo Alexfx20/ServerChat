@@ -1,6 +1,7 @@
 package ru.secondchat.client;
 
 
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.network.ConnectionListener;
 import ru.secondchat.network.SocketConnection;
@@ -29,31 +30,38 @@ public class Client implements ConnectionListener {
             sc=new Scanner(System.in);
     }
 
+    private void go(){
+        if(innerRegistration()){
+            try {
+                this.connection = new SocketConnection(this, IP, PORT);
+                this.onConnectionReady(connection);
+                this.onRegistration(connection);
+                connection.startNewChat();
+                transmitMessage();
+            } catch (IOException e) {
+                printMessage("Connection Exception: " + e);
+            }
+        }
+    }
+
     @Override
     public void onConnectionReady(Connection connection) {
         try{
         if(connection!=null)
-            System.out.println(connection.recieveSingleMessage());
+           printMessage(connection.recieveSingleMessage());
         else System.out.println("Server is unavailable, try again later");}
         catch(IOException e){
-            System.out.println("Server refused to provide a connection");
+            printMessage("Server refused to provide a connection");
         }
 
     }
 
     @Override
     public void onRegistration(Connection connection) throws IOException{
-        //try{
 
-                System.out.print(connection.recieveSingleMessage()+" ");
+                printMessage(connection.recieveSingleMessage()+" ");
                 if(!regParams.isEmpty())
                 connection.sendMessage(regParams);
-
-
-        //}
-        /*catch(IOException e){
-            System.out.println("Something bad happening...");
-        }*/
 
     }
 
@@ -79,35 +87,32 @@ public class Client implements ConnectionListener {
 
     @Override
     public void processCommands(String value) {
-       if(value.startsWith("/left")){
-            connection.sendMessage("/endOfChat");
-           System.out.println(value);
+       if(value.startsWith(Commands.LEFT.getCommand())){
+            connection.sendMessage(Commands.END_OF_CHAT.getCommand());
+
             value = value.substring(6,value.length())+" ended the conversation";
-           System.out.println(value);
+            value = filterCommandMessages(value);
         }
-        else if (value.startsWith("/out")){
-           connection.sendMessage("/endOfChat");
-           System.out.println(value);
-           value = value.substring(5,value.length())+" exit the program";
-           System.out.println(value);
+        else if (value.startsWith(Commands.OUT.getCommand())){
+           connection.sendMessage(Commands.END_OF_CHAT.getCommand());
+
+           value = value.substring(Commands.OUT.getCommand().length(),value.length())+" exit the program";
+            value = filterCommandMessages(value);
 
        }
-        else if(value.startsWith("/Timeout")){
+        else if(value.startsWith(Commands.TIME_OUT.getCommand())){
            printMessage("You have just exceeded latency time");
            value = "Press ENTER to exit the program";
            isOnline = false;
            onDisconnect(connection);
         }
-        else if (value.equals("/access denied")){
+        else if (value.equals(Commands.ACCESS_DENIED.getCommand())){
            printMessage("Access denied. Wrong registration parameters: "+status+" "+name);
            isOnline = false;
            value = "press ENTER to exit the program";
-
            onDisconnect(connection);
-
-
        }
-       else if (value.equals("/exit")){
+       else if (value.equals(Commands.EXIT.getCommand())){
            onDisconnect(connection);
            value =" Good Bye "+ name;
        }
@@ -117,23 +122,9 @@ public class Client implements ConnectionListener {
 
     public void processSelfCommand(String value){
         connection.sendMessage(value);
-        if(value.equals("/exit")){
+        if(value.equals(Commands.EXIT.getCommand())){
             isOnline = false;
         }
-
-
-    }
-
-
-
-    private synchronized void printMessage(String message){
-        if(status.equals("agent")){
-            int indexOfID = message.lastIndexOf("$");
-            if(indexOfID!=-1)
-            message=message.substring(0,indexOfID);
-        }
-        System.out.println(message);
-
     }
 
     private void transmitMessage(){
@@ -143,23 +134,41 @@ public class Client implements ConnectionListener {
         }
     }
 
-    private void go(){
-        if(innerRegistration()){
-            try {
-                this.connection = new SocketConnection(this, IP, PORT);
-                this.onConnectionReady(connection);
-                this.onRegistration(connection);
-                connection.startNewChat();
-                transmitMessage();
-            } catch (IOException e) {
-                System.out.println("Connection Exception: " + e);
-            }
+    private synchronized void printMessage(String message){
+        if(status.equals("agent")){
+           message = filterAgentsMessages(message);
         }
+
+        System.out.println(message);
+
     }
 
+    private String filterCommandMessages(String message){
+        int indexOfID = message.lastIndexOf("$");
+        if(indexOfID!=-1){
+            int indOfExit = message.lastIndexOf("exit the program");
+            if(indOfExit ==-1) indOfExit = message.lastIndexOf("ended the conversation");
+            if((indOfExit!=-1)&&(indOfExit-indexOfID == 3)){
+                StringBuilder str = new StringBuilder(message);
+                str.deleteCharAt(indexOfID);
+                str.deleteCharAt(indexOfID);
+                message=str.toString();
+            }
+        }
+
+        return message;
+    }
+
+    private String filterAgentsMessages(String message){
+        int indexOfID = message.lastIndexOf("$");
+        if(indexOfID!=-1){
+                message=message.substring(0,indexOfID);
+        }
+        return message;
+    }
 
     private boolean innerRegistration(){
-        regParams="/register ";
+        regParams=Commands.REGISTER.getCommand()+" ";
         System.out.println("Please enter your name: ");
         name = sc.nextLine();
         if(!name.isEmpty()){
@@ -167,12 +176,12 @@ public class Client implements ConnectionListener {
            int forbidenAmpersand = name.indexOf("$");
            while(forbidenAmpersand!=-1||forbidenSlash!=-1){
                System.out.println("space characters and ampersands '$' are not allowed in Name");
-               System.out.println("try again or type /exit to exit the program");
+               System.out.println(String.format("try again or type %s to exit the program", Commands.EXIT.getCommand() ));
                name=sc.nextLine();
                forbidenSlash = name.indexOf(" ");
                forbidenAmpersand = name.indexOf("$");
            }
-           if(name.equals("/exit")) return false;
+           if(name.equals(Commands.EXIT.getCommand())) return false;
            else regParams +=name+" ";
         }
         System.out.println("Please enter your status (client or agent): ");
@@ -181,6 +190,4 @@ public class Client implements ConnectionListener {
 
         return true;
     }
-
-
 }

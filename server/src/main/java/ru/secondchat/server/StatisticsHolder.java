@@ -35,11 +35,11 @@ public class StatisticsHolder {
     }
 
     public LinkedBlockingQueue<ClientHandler> getFreeagents() {
-        return Server.agents;
+        return Server.getAgents();
     }
 
     public LinkedBlockingQueue<ClientHandler> getFreeclients() {
-        return Server.customers;
+        return Server.getCustomers();
     }
 
     public User getAgentByID(long id){
@@ -53,7 +53,7 @@ public class StatisticsHolder {
         return tmp;
     }
     public User getClientByID(long id){
-        Object[] clients = Server.customers.toArray();
+        Object[] clients = Server.getCustomers().toArray();
         for (Object client:clients) {
             ClientHandler tmp = (ClientHandler)client;
             if(id==tmp.getId()){

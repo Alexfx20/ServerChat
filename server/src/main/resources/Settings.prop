@@ -1,0 +1,15 @@
+#Server Settings
+#Mon Sep 17 00:52:11 MSK 2018
+MAX_ALLOWED_CONNECTIONS=100
+MAX_MINUTES_ONLINE=10
+USERS_THREAD_LIFETIME=2
+MAX_AGENTS=20
+PORT=5000
+beanConfigSetBasePath=/server-1.0-SNAPSHOT/rest
+beanConfigSetHost=localhost:8080
+beanConfigSetTitle=Chat RestServices Docs
+beanConfigSetSchemes=http
+beanConfigSetVersion=1.0
+
+
+

@@ -18,8 +18,9 @@ public class StartServletContextListener implements ServletContextListener {
 
         thread = new Thread(() -> {
             System.out.println("Running the server... ");
-            String [] args= new String[2];
-            Server.main(args);
+            /*String [] args= new String[2];
+            Server.main(args);*/
+            server.go();
             System.out.println("Server started successfully");
            });
         thread.start();
@@ -28,6 +29,6 @@ public class StartServletContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         server.shutDown();
-        //thread.interrupt();
+
     }
 }

@@ -1,5 +1,6 @@
 package ru.secondchat.user;
 
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.server.ClientHandler;
 import ru.secondchat.server.Server;
@@ -28,7 +29,7 @@ public class Customer extends User{
 
         try {
             String firstMessage = handlingUser.recieveSingleMessage();
-            if(!(firstMessage.equals("/exit")||firstMessage.equals("/leave"))) {
+            if(!(firstMessage.equals(Commands.EXIT.getCommand())||firstMessage.startsWith(Commands.LEAVE.getCommand()))) {
                                                          //setКeadytoСhat было здесь!!!!!!!!!!
                 clientHandler.setFirstMessage(this.getStatus()+" "+this.getName()+" "+firstMessage);    // и записываем его первое сообщение
             }
@@ -71,12 +72,8 @@ public class Customer extends User{
     @Override
     public void sendMessageByID(String message) {
         if(recipient!=null) {
-           /* try {
-                Thread.sleep(30000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
-            recipient.sendMessage(getStatus() + " " + getName() + " " + message + ID);//если соединение не ноль, то пишем сообщение здесь каждый клиент отсылает в конец свой ID
+
+            recipient.sendMessage(getStatus() + " " + getName() + " : " + message + ID);//если соединение не ноль, то пишем сообщение здесь каждый клиент отсылает в конец свой ID
         }
     }
 

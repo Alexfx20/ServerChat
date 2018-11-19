@@ -3,6 +3,7 @@ package ru.secondchat.web;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.RestConnection;
 import ru.secondchat.server.Server;
 
@@ -41,7 +42,7 @@ public class RestClientsHandlerTest {
 
     @Test
     public void getRegistrationMessage(){
-        String tmp = "/register "+name+" "+status+"$";
+        String tmp = Commands.REGISTER.getCommand()+" "+name+" "+status+"$";
         System.out.println(tmp);
         String regParams = client1.getRegistrationMessage(name, status, maxConnections);
         String regParams2 = client1.getRegistrationMessage(name, status, 0);
@@ -59,7 +60,7 @@ public class RestClientsHandlerTest {
         assertEquals("doesn't add new RestConnections to Server queue", (Server.getConnectionsSize()-tempConnectionsSize),1);
         assertEquals("Error while adding RestClient to the map", client1, RestClientsHandler.getInstance(id));
         RestConnection restConnection = client1.getConnection();
-        String regTemplate = "/register "+name+" "+status+"$"+maxConnections; //то что должно поместиться в очередь connection
+        String regTemplate = Commands.REGISTER.getCommand()+" "+name+" "+status+"$"+maxConnections; //то что должно поместиться в очередь connection
         String actual = restConnection.recieveSingleMessage();//извлекаем сообщение находящееся в очереди соединения
         assertEquals("RestConnection receiveMessage Error", regTemplate, actual);
         client1.onDisconnect(restConnection);

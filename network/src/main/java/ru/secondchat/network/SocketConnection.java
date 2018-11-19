@@ -77,9 +77,10 @@ public class SocketConnection implements Connection {
         /*if(rxThread.isInterrupted())
         System.out.println("Thread stoped");*/
         try {
-            if (socket.isConnected())
-            socket.close();
-            /*if (socket.isClosed()) System.out.println("socket closed");*/
+            if (socket.isConnected()){
+
+                socket.close();}
+
 
         } catch (IOException e) {
             System.out.println("Exception in disconnect method");

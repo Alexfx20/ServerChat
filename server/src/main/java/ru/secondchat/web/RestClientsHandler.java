@@ -1,5 +1,6 @@
 package ru.secondchat.web;
 
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.network.ConnectionListener;
 import ru.secondchat.network.RestConnection;
@@ -44,9 +45,14 @@ public class RestClientsHandler implements ConnectionListener {
     String response(String message, String id){
         String lineseparator = System.getProperty("line.separator");
         StringBuilder bd = new StringBuilder();
-        bd.append("User:{"+lineseparator);
-        bd.append("id: "+id+lineseparator);
-        bd.append("message: "+message+lineseparator);
+        bd.append("User:{");
+        bd.append(lineseparator);
+        bd.append("id: ");
+        bd.append(id);
+        bd.append(lineseparator);
+        bd.append("message: ");
+        bd.append(message);
+        bd.append(lineseparator);
         bd.append("}");
 
 
@@ -54,7 +60,7 @@ public class RestClientsHandler implements ConnectionListener {
     }
 
     String getRegistrationMessage(String name, String status, int numOfMaxConnections){
-        StringBuilder bd = new StringBuilder("/register ");
+        StringBuilder bd = new StringBuilder(Commands.REGISTER.getCommand()+" ");
         bd.append(name+" ");
         bd.append(status);
         String numOfConns = numOfMaxConnections==0 ? "$1" : ("$"+numOfMaxConnections);
@@ -64,7 +70,7 @@ public class RestClientsHandler implements ConnectionListener {
     }
 
     String quit(){
-        restConnection.addMessage("/exit");
+        restConnection.addMessage(Commands.EXIT.getCommand());
 
         return response("Good Bye", this.id);
     }
@@ -113,7 +119,7 @@ public class RestClientsHandler implements ConnectionListener {
         if(value!=null){
             if(messages.size()>=499)
                 messages.pollLast();
-            if(value.startsWith("/"))
+            if(value.startsWith(Commands.COMMAND_IDENTIFIER.getCommand()))
                 processCommands(value);
             else
                 messages.offerFirst(value);
@@ -127,27 +133,27 @@ public class RestClientsHandler implements ConnectionListener {
 
     @Override
     public void onException(Connection connection, Exception e) {
-        restConnection.addMessage("/exit");
+        restConnection.addMessage(Commands.EXIT.getCommand());
 
     }
 
     @Override
     public void processCommands(String value) {
-        if (value.startsWith("/left")) {
-            restConnection.addMessage("/endOfChat");
-            value = "User ended the conversation: "+value.substring(6, value.length());
+        if (value.startsWith(Commands.LEFT.getCommand())) {
+            restConnection.addMessage(Commands.END_OF_CHAT.getCommand());
+            value = "User ended the conversation: "+value.substring(Commands.LEFT.getCommand().length()+1, value.length());
         }
-        else if (value.startsWith("/out")) {
-            restConnection.addMessage("/endOfChat");
-            value = "User exit the program: "+value.substring(5, value.length());
+        else if (value.startsWith(Commands.OUT.getCommand())) {
+            restConnection.addMessage(Commands.END_OF_CHAT.getCommand());
+            value = "User exit the program: "+value.substring(Commands.OUT.getCommand().length()+1, value.length());
         }
-        else if (value.startsWith("/Timeout")) {
+        else if (value.startsWith(Commands.TIME_OUT.getCommand())) {
             value = "You have just exceeded latency time ";
         }
-        else if (value.equals("/access denied")) {
+        else if (value.equals(Commands.ACCESS_DENIED.getCommand())) {
             value = "Access denied. Wrong registration parameters";
         }
-        else if (value.equals("/exit")) {
+        else if (value.equals(Commands.EXIT.getCommand())) {
             value = "Good Bye";
         }
         messages.offerFirst(value);

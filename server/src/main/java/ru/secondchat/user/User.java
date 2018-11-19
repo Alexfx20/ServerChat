@@ -3,13 +3,14 @@ package ru.secondchat.user;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.secondchat.network.Commands;
 import ru.secondchat.network.Connection;
 import ru.secondchat.server.ClientHandler;
 
 import java.io.IOException;
 //@XmlRootElement(name = "user")
 //@XmlType(propOrder = {"name", "status", "id", "number_of_recipients"})
-/*Абстрактный класс Юзер, содержит пля, характеризующие клиента\агента, сетеры и гетеры этих полей*/
+/*Абстрактный класс Юзер, содержит поля, характеризующие клиента\агента, сетеры и гетеры этих полей*/
 public abstract class User {
 
     static final Logger clientLogger = LogManager.getLogger(ClientHandler.class);
@@ -140,7 +141,7 @@ public abstract class User {
        setPromptForRelax(true);
        if(recipientHandler!=null){
            recipientHandler.getUser().endChatWith(ID, recipientHandler);//т.к. у user нет ссылки на clientHandler то ее нужно положить в этот метод
-           recipient.sendMessage(String.format("/left %s %s %s", getStatus(), getName(), ID));}//String.format("%s has just left the chat./", name)
+           recipient.sendMessage(String.format("%s %s %s %s", Commands.LEFT.getCommand(), getStatus(), getName(), ID));}//String.format("%s has just left the chat./", name)
        clientLogger.info(getStatus()+" "+getName()+" has ended the chat. ID: "+ID);
    }
 
@@ -151,9 +152,10 @@ public abstract class User {
         public void exit(String value){
             setReadyToChat(false);
             if(recipientHandler!=null){
-            recipientHandler.getUser().endChatWith(ID, recipientHandler);
-                System.out.println("Между endChat и сообщением recipient");
-                recipientHandler.getHandlingUser().sendMessage(String.format("/out %s %s %s", getStatus(), getName(), ID));}
+                recipientHandler.getUser().endChatWith(ID, recipientHandler);
+                Connection recipientConnection = recipientHandler.getHandlingUser();
+                if(recipientConnection!=null)
+                recipientConnection.sendMessage(String.format("%s %s %s %s",Commands.OUT.getCommand(), getStatus(), getName(), ID));}
 
         }
        // @XmlTransient
